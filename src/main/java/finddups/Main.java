@@ -23,7 +23,7 @@ public class Main {
             final FileFinder fileFinder = new FileFinder();
             final List<File> files = fileFinder.recurseDir(new File(args[0]), minBytes);
 
-            System.out.println("Found " + files.size() + " files. Searching for duplicates.");
+            System.out.println("Found " + files.size() + " files over " + minBytes + " bytes.");
             findDuplicates(files);
         } catch (final RuntimeException e) {
             e.printStackTrace(System.err);
@@ -39,11 +39,14 @@ public class Main {
      */
     private static void findDuplicates(final List<File> files) {
         // Sort them by size
+        System.out.print("Sorting... ");
         Collections.sort(files, new FileSizeComparator());
+        System.out.println("Sorted.");
         long previousLength = Long.MAX_VALUE;
         final List<File> sameSize = new ArrayList<File>();
         final DuplicateFinder duplicateFinder = new DuplicateFinder();
         // Go through the list...
+        System.out.println("Searching for duplicates.");
         for (final File file : files) {
             if (file.length() == previousLength) {
                 // Add them to the a list for checking
@@ -56,8 +59,8 @@ public class Main {
             }
             previousLength = file.length();
         }
+        System.out.println("Total bytes duplicated : " + duplicateFinder.getDuplicatedBytes());
     }
-
 }
 
 class FileSizeComparator implements Comparator<File> {

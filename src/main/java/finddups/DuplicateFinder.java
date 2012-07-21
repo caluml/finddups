@@ -8,21 +8,27 @@ import java.util.List;
 
 public class DuplicateFinder {
 
+    private long duplicatedBytes = 0;
+
     public void checkFiles(final List<File> sameSize) {
-        for (int i = 0; i < (sameSize.size() - 1); i++) {
-            final File firstFile = sameSize.get(i);
-            final File secondFile = sameSize.get(i + 1);
+        for (int firstNum = 0; firstNum < sameSize.size(); firstNum++) {
+            final File firstFile = sameSize.get(firstNum);
             if (!firstFile.canRead()) {
                 System.err.println("Can't read " + firstFile);
                 return;
             }
-            if (!secondFile.canRead()) {
-                System.err.println("Can't read " + secondFile);
-                return;
-            }
-            if (isSame(firstFile, secondFile)) {
-                System.out.println(firstFile.getAbsolutePath() + " = "
-                        + secondFile.getAbsolutePath());
+            for (int secondNum = firstNum + 1; secondNum < sameSize.size(); secondNum++) {
+                final File secondFile = sameSize.get(secondNum);
+                if (!secondFile.canRead()) {
+                    System.err.println("Can't read " + secondFile);
+                    return;
+                }
+                if (isSame(firstFile, secondFile)) {
+                    final long fileSize = firstFile.length();
+                    this.duplicatedBytes = this.duplicatedBytes + fileSize;
+                    System.out.println(fileSize + " " + firstFile.getAbsolutePath() + " = "
+                            + secondFile.getAbsolutePath());
+                }
             }
         }
     }
@@ -57,5 +63,9 @@ public class DuplicateFinder {
                 e.printStackTrace();
             }
         }
+    }
+
+    public long getDuplicatedBytes() {
+        return this.duplicatedBytes;
     }
 }
