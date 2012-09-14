@@ -13,9 +13,9 @@ public class DuplicateFinder {
     private long duplicatedBytes = 0;
 
     /**
-     * We have a list of files, and sort them by size. We now just look down the list making another
-     * list of files which are the same size, and when we have that we check them all for
-     * duplication.
+     * We have a list of files, and sort them by size. We now just look down the
+     * list making another list of files which are the same size, and when we
+     * have that we check them all for duplication.
      * 
      * @param files
      */
@@ -40,6 +40,9 @@ public class DuplicateFinder {
             }
             previousLength = file.length();
         }
+        // Need to check this after the loop to avoid leaving the final group alone if the last file doesn't differ in size
+        checkFiles(sameSize);
+
         System.out.println("Total bytes duplicated : " + getDuplicatedBytes());
     }
 
