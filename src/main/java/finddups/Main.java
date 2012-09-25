@@ -14,7 +14,7 @@ public class Main {
     private static int minBytes;
 
     /**
-     * Usage: java -jar finddups.jar /data/path/ 10000
+     * Usage: java -jar finddups.jar 10000 /data/path/ /another/path
      * 
      * @param args the arguments to use
      */
