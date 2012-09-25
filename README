@@ -4,8 +4,8 @@ You can either build the application from source, or download a pre-compiled ver
 To build from source, you need Git, a Java JDK, and Maven:
 
 git clone https://github.com/caluml/finddups
-mvn clean install
-java -jar ~/.m2/repository/finddups/finddups/0.0.1-SNAPSHOT/finddups-0.0.1-SNAPSHOT.jar 1000000 /home /tmp
+mvn assembly:single install
+java -jar ~/.m2/repository/finddups/finddups/0.0.1-SNAPSHOT/finddups-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000 /home /tmp
 
 To just run the supplied version (might be a little out of date):
 

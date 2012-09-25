@@ -12,6 +12,10 @@ public class DuplicateFinder {
 
     private long duplicatedBytes = 0;
 
+    private long bytesChecked = 0;
+
+    // private long md5BytesChecked = 0;
+
     /**
      * We have a list of files, and sort them by size. We now just look down the list making another
      * list of files which are the same size, and when we have that we check them all for
@@ -24,8 +28,9 @@ public class DuplicateFinder {
         System.out.print("Sorting... ");
         final long startSort = System.currentTimeMillis();
         Collections.sort(files, new FileSizeComparator());
-        System.out.println(String.format("Sorted %d files in %d ms.", files.size(),
-                (System.currentTimeMillis() - startSort)));
+        System.out
+                .println(String.format("Sorted %d files in %d ms.", Integer.valueOf(files.size()),
+                        Long.valueOf(System.currentTimeMillis() - startSort)));
         long previousLength = Long.MAX_VALUE;
         final List<File> sameSize = new ArrayList<File>();
         // Go through the list...
@@ -46,10 +51,26 @@ public class DuplicateFinder {
         // doesn't differ in size
         checkFiles(sameSize);
 
-        System.out.println("Total bytes duplicated : " + getDuplicatedBytes());
+        System.out.println("Bytes read to check    : " + this.bytesChecked);
+        // System.out.println("Bytes read to check with md5s : " + this.md5BytesChecked);
+        System.out.println("Total bytes duplicated : " + this.duplicatedBytes);
     }
 
     private void checkFiles(final List<File> sameSize) {
+        if (sameSize.size() < 2) {
+            return;
+        }
+        // final int numFiles = sameSize.size();
+        // final long bytesToCheck = sameSize.size() * sameSize.get(0).length();
+        // System.out.println("    checking : " + bytesToCheck + " bytes in " + numFiles +
+        // " files");
+
+        // TODO: Work out where the best payoff lies. Reading the MD5 requires reading the entire
+        // file, but checking byte by byte might find that it's different 5 bytes in.
+        // if (bytesToCheck > 10000000) {
+        // compareWithMd5(sameSize);
+        // }
+
         for (int firstNum = 0; firstNum < sameSize.size(); firstNum++) {
             final File firstFile = sameSize.get(firstNum);
             if (!firstFile.canRead()) {
@@ -81,13 +102,17 @@ public class DuplicateFinder {
             second = new BufferedInputStream(new FileInputStream(secondFile), 4096);
             int firstInt = Integer.MAX_VALUE;
             int secondInt = Integer.MAX_VALUE;
+            long count = 0;
             while (firstInt != -1 && secondInt != -1) {
                 firstInt = first.read();
                 secondInt = second.read();
+                count++;
                 if (firstInt != secondInt) {
+                    this.bytesChecked = this.bytesChecked + count;
                     return false;
                 }
             }
+            this.bytesChecked = this.bytesChecked + count;
             return true;
         } catch (final Exception e) {
             throw new RuntimeException(e);
@@ -105,7 +130,26 @@ public class DuplicateFinder {
         }
     }
 
-    private long getDuplicatedBytes() {
-        return this.duplicatedBytes;
-    }
+    // /**
+    // * Method that checks for duplicates by calculating MD5s
+    // *
+    // * @param sameSize
+    // */
+    // private void compareWithMd5(final List<File> sameSize) {
+    // final Map<File, String> md5s = new HashMap<File, String>();
+    // for (final File file : sameSize) {
+    // try {
+    // md5s.put(file, DigestUtils.md5Hex(new FileInputStream(file)));
+    // this.md5BytesChecked = this.md5BytesChecked + file.length();
+    // } catch (final FileNotFoundException e) {
+    // e.printStackTrace();
+    // } catch (final IOException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // final Set<String> hashSet = new HashSet<String>(md5s.values());
+    // if (hashSet.size() != md5s.size()) {
+    // System.err.println("DUPLICATE FILE!!");
+    // }
+    // }
 }

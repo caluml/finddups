@@ -27,8 +27,8 @@ public class Main {
 
             minBytes = Integer.parseInt(args[0]);
             final String[] dirs = Arrays.copyOfRange(args, 1, args.length);
-            System.out.println(String.format("Finding files over %d bytes in %s", minBytes,
-                    Arrays.toString(dirs)));
+            System.out.println(String.format("Finding files over %d bytes in %s",
+                    Integer.valueOf(minBytes), Arrays.toString(dirs)));
 
             final FileFinder fileFinder = new FileFinder();
             final long start = System.currentTimeMillis();
@@ -37,7 +37,8 @@ public class Main {
             }
             final List<File> files = fileFinder.getFiles();
             System.out.println(String.format("Found %d files over %d bytes in %d ms.",
-                    files.size(), minBytes, System.currentTimeMillis() - start));
+                    Integer.valueOf(files.size()), Integer.valueOf(minBytes),
+                    Long.valueOf(System.currentTimeMillis() - start)));
 
             final DuplicateFinder duplicateFinder = new DuplicateFinder();
             duplicateFinder.findDuplicates(files);
