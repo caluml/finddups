@@ -5,12 +5,12 @@ To build from source, you need Git, a Java JDK, and Maven:
 
 git clone https://github.com/caluml/finddups
 mvn clean install
-java -jar ~/.m2/repository/finddups/finddups/0.0.1-SNAPSHOT/finddups-0.0.1-SNAPSHOT.jar / 1000000
+java -jar ~/.m2/repository/finddups/finddups/0.0.1-SNAPSHOT/finddups-0.0.1-SNAPSHOT.jar 1000000 /home /tmp
 
 To just run the supplied version (might be a little out of date):
 
 Download https://github.com/caluml/finddups/raw/master/finddups.jar
-java -jar finddups.jar / 1000000
+java -jar finddups.jar 1000000 /home /tmp
 
 
 First, it recurses the given directory, building a list of files.
