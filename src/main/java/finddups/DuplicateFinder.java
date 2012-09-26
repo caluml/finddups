@@ -10,11 +10,17 @@ import java.util.List;
 
 public class DuplicateFinder {
 
+    private final Outputter outputter;
+
     private long duplicatedBytes = 0;
 
     private long bytesChecked = 0;
 
     // private long md5BytesChecked = 0;
+
+    public DuplicateFinder(final Outputter outputter) {
+        this.outputter = outputter;
+    }
 
     /**
      * We have a list of files, and sort them by size. We now just look down the list making another
@@ -25,16 +31,16 @@ public class DuplicateFinder {
      */
     public void findDuplicates(final List<File> files) {
         // Sort them by size
-        System.out.print("Sorting... ");
+        this.outputter.output("Sorting... ");
         final long startSort = System.currentTimeMillis();
         Collections.sort(files, new FileSizeComparator());
-        System.out
-                .println(String.format("Sorted %d files in %d ms.", Integer.valueOf(files.size()),
+        this.outputter
+                .output(String.format("Sorted %d files in %d ms.", Integer.valueOf(files.size()),
                         Long.valueOf(System.currentTimeMillis() - startSort)));
         long previousLength = Long.MAX_VALUE;
         final List<File> sameSize = new ArrayList<File>();
         // Go through the list...
-        System.out.println("Searching for duplicates.");
+        this.outputter.output("Searching for duplicates.");
         for (final File file : files) {
             if (file.length() == previousLength) {
                 // Add them to the a list for checking
@@ -51,9 +57,9 @@ public class DuplicateFinder {
         // doesn't differ in size
         checkFiles(sameSize);
 
-        System.out.println("Bytes read to check    : " + this.bytesChecked);
-        // System.out.println("Bytes read to check with md5s : " + this.md5BytesChecked);
-        System.out.println("Total bytes duplicated : " + this.duplicatedBytes);
+        this.outputter.output("Bytes read to check    : " + this.bytesChecked);
+        // outputter.output("Bytes read to check with md5s : " + this.md5BytesChecked);
+        this.outputter.output("Total bytes duplicated : " + this.duplicatedBytes);
     }
 
     private void checkFiles(final List<File> sameSize) {
@@ -74,19 +80,19 @@ public class DuplicateFinder {
         for (int firstNum = 0; firstNum < sameSize.size(); firstNum++) {
             final File firstFile = sameSize.get(firstNum);
             if (!firstFile.canRead()) {
-                System.err.println("Can't read " + firstFile);
+                this.outputter.outputError("Can't read " + firstFile);
                 return;
             }
             for (int secondNum = firstNum + 1; secondNum < sameSize.size(); secondNum++) {
                 final File secondFile = sameSize.get(secondNum);
                 if (!secondFile.canRead()) {
-                    System.err.println("Can't read " + secondFile);
+                    this.outputter.outputError("Can't read " + secondFile);
                     return;
                 }
                 if (isSame(firstFile, secondFile)) {
                     final long fileSize = firstFile.length();
                     this.duplicatedBytes = this.duplicatedBytes + fileSize;
-                    System.out.println(fileSize + " " + firstFile.getAbsolutePath() + " = "
+                    this.outputter.output(fileSize + " " + firstFile.getAbsolutePath() + " = "
                             + secondFile.getAbsolutePath());
                 }
             }
@@ -106,7 +112,7 @@ public class DuplicateFinder {
             while (firstInt != -1 && secondInt != -1) {
                 firstInt = first.read();
                 secondInt = second.read();
-                count++;
+                count = count + 2;
                 if (firstInt != secondInt) {
                     this.bytesChecked = this.bytesChecked + count;
                     return false;

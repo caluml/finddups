@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.junit.Rule;
@@ -18,36 +17,26 @@ public class DuplicateFinderTest {
 
     @Test
     public void Identical_files_are_identical() throws IOException {
-        final DuplicateFinder duplicateFinder = new DuplicateFinder();
+        final RecordingOutputter outputter = new RecordingOutputter();
+        final DuplicateFinder duplicateFinder = new DuplicateFinder(outputter);
         final File dir = this.temp.newFolder();
         final File a = new File(dir, "a");
         final File b = new File(dir, "b");
-        final FileOutputStream aos = new FileOutputStream(a);
-        aos.write("test".getBytes("UTF-8"));
-        aos.flush();
-        aos.close();
-        final FileOutputStream bos = new FileOutputStream(b);
-        bos.write("test".getBytes("UTF-8"));
-        bos.flush();
-        bos.close();
+        FileUtils.writeContent(a, "test");
+        FileUtils.writeContent(b, "test");
 
         assertTrue("Files should be the same", duplicateFinder.isSame(a, b));
     }
 
     @Test
     public void Different_files_are_different() throws IOException {
-        final DuplicateFinder duplicateFinder = new DuplicateFinder();
+        final RecordingOutputter outputter = new RecordingOutputter();
+        final DuplicateFinder duplicateFinder = new DuplicateFinder(outputter);
         final File dir = this.temp.newFolder();
         final File a = new File(dir, "a");
         final File b = new File(dir, "b");
-        final FileOutputStream aos = new FileOutputStream(a);
-        aos.write("test".getBytes("UTF-8"));
-        aos.flush();
-        aos.close();
-        final FileOutputStream bos = new FileOutputStream(b);
-        bos.write("XXXX".getBytes("UTF-8"));
-        bos.flush();
-        bos.close();
+        FileUtils.writeContent(a, "test");
+        FileUtils.writeContent(b, "XXXX");
 
         assertFalse("Files should be different", duplicateFinder.isSame(a, b));
     }

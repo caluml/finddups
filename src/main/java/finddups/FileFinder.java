@@ -8,10 +8,16 @@ import java.util.List;
 
 public class FileFinder {
 
+    private final Outputter outputter;
+
     /**
      * The files found
      */
     private final List<File> files = new ArrayList<File>();
+
+    public FileFinder(final Outputter outputter) {
+        this.outputter = outputter;
+    }
 
     /**
      * Finds files in the given directory over the specified size
@@ -32,13 +38,13 @@ public class FileFinder {
                     if (entry.canRead()) {
                         findFiles(entry, minBytes);
                     } else {
-                        System.err.println("Can't read directory " + entry);
+                        this.outputter.outputError("Can't read directory " + entry);
                     }
                 } else {
-                    System.err.println("Skipping " + entry + " as it's not a file or dir");
+                    this.outputter.outputError("Skipping " + entry + " as it's not a file or dir");
                 }
             } else {
-                System.err.println("Skipping " + entry + " as it's a symlink");
+                this.outputter.outputError("Skipping " + entry + " as it's a symlink");
             }
         }
     }
