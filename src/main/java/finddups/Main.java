@@ -14,6 +14,12 @@ public class Main {
     private static int minBytes;
 
     /**
+     * boolean to control debug output. Run with DEBUG=true java -jar ... to enable. Not intended
+     * for general usage.
+     */
+    static boolean DEBUG;
+
+    /**
      * Usage: java -jar finddups.jar 10000 /data/path/ /another/path
      * 
      * @param args the arguments to use
@@ -33,6 +39,9 @@ public class Main {
 
     static void finddups(final String[] args, final Outputter outputter) {
         // Default visibility for testing
+        if ("true".equals(System.getenv("DEBUG"))) {
+            Main.DEBUG = true;
+        }
         minBytes = Integer.parseInt(args[0]);
         final String[] dirs = Arrays.copyOfRange(args, 1, args.length);
         outputter.output(String.format("Finding files over %d bytes in %s",

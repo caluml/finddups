@@ -1,5 +1,10 @@
 package finddups;
 
+/**
+ * Implementation of Outputter which outputs to System.out and System.err
+ * 
+ * @author calum
+ */
 public class SysoutOutputter implements Outputter {
 
     @Override

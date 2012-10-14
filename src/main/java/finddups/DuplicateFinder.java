@@ -101,6 +101,7 @@ public class DuplicateFinder {
 
     boolean isSame(final File firstFile, final File secondFile) {
         // Default visibility for testing.
+        final long start = System.currentTimeMillis();
         BufferedInputStream first = null;
         BufferedInputStream second = null;
         try {
@@ -115,10 +116,18 @@ public class DuplicateFinder {
                 count = count + 2;
                 if (firstInt != secondInt) {
                     this.bytesChecked = this.bytesChecked + count;
+                    if (Main.DEBUG) {
+                        System.out.println("\tInequal after " + this.bytesChecked + " bytes in "
+                                + (System.currentTimeMillis() - start) + " ms");
+                    }
                     return false;
                 }
             }
             this.bytesChecked = this.bytesChecked + count;
+            if (Main.DEBUG) {
+                System.out.println("\tEqual after " + this.bytesChecked + " bytes in "
+                        + (System.currentTimeMillis() - start) + " ms");
+            }
             return true;
         } catch (final Exception e) {
             throw new RuntimeException(e);
