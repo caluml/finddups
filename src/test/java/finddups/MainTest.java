@@ -31,10 +31,17 @@ public class MainTest {
         final String testDir = dir.toString();
         Main.finddups(new String[] { "0", testDir }, outputter);
 
-        final String expectedMessage = String.format("4 %s/one/two/three/a = %s/one/two/three/b",
+        final String expectedMessage1 = String.format("4 %s/one/two/three/a = %s/one/two/three/b",
+                testDir, testDir);
+        final String expectedMessage2 = String.format("4 %s/one/two/three/b = %s/one/two/three/a",
                 testDir, testDir);
 
-        assertEquals(expectedMessage, outputter.getMessages().get(5));
+        try {
+            assertEquals(expectedMessage1, outputter.getMessages().get(5));
+        } catch (final AssertionError e) {
+            // It's possible the files are listed in the second order
+            assertEquals(expectedMessage2, outputter.getMessages().get(5));
+        }
         assertEquals("Bytes read to check    : 10", outputter.getMessages().get(6));
         assertEquals("Total bytes duplicated : 4", outputter.getMessages().get(7));
     }
