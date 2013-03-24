@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -99,6 +100,7 @@ public class DuplicateFinder {
         }
     }
 
+    @SuppressWarnings({ "resource" })
     boolean isSame(final File firstFile, final File secondFile) {
         // Default visibility for testing.
         final long start = System.currentTimeMillis();
@@ -111,8 +113,12 @@ public class DuplicateFinder {
             int secondInt = Integer.MAX_VALUE;
             long count = 0;
             while (firstInt != -1 && secondInt != -1) {
-                firstInt = first.read();
-                secondInt = second.read();
+                try {
+                    firstInt = first.read();
+                    secondInt = second.read();
+                } catch (final IOException e) {
+                    return false;
+                }
                 count = count + 2;
                 if (firstInt != secondInt) {
                     this.bytesChecked = this.bytesChecked + count;
@@ -132,15 +138,18 @@ public class DuplicateFinder {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         } finally {
-            try {
-                if (first != null) {
-                    first.close();
+            quietlyClose(first, second);
+        }
+    }
+
+    private void quietlyClose(final InputStream... inputStreams) {
+        for (final InputStream inputStream : inputStreams) {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (final IOException e) {
+                    // Nothing
                 }
-                if (second != null) {
-                    second.close();
-                }
-            } catch (final IOException e) {
-                e.printStackTrace();
             }
         }
     }
