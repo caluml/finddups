@@ -2,6 +2,8 @@ package finddups;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,27 +28,59 @@ public class FileFinder {
      * @param minBytes the minimum file size
      */
     public void findFiles(final File dir, final int minBytes) {
+        if (!dir.isDirectory()) {
+            // "Returns null if this abstract pathname does not denote a directory..."
+            this.outputter.outputError(dir + " is not a directory!");
+            return;
+        }
         final File[] entries = dir.listFiles();
+        if (entries == null) {
+            // "Returns null ... if an I/O error occurs."
+            this.outputter.outputError(dir + " entries is null!");
+            return;
+        }
 
         for (final File entry : entries) {
-            if (!isSymlink(entry)) {
-                if (entry.isFile()) {
-                    if (entry.length() >= minBytes) {
-                        this.files.add(entry);
-                    }
-                } else if (entry.isDirectory()) {
-                    if (entry.canRead()) {
-                        findFiles(entry, minBytes);
+            try {
+                if (!isSymlink(entry)) {
+                    if (entry.isFile()) {
+                        if (entry.length() >= minBytes) {
+                            this.files.add(entry);
+                        }
+                    } else if (entry.isDirectory()) {
+                        if (entry.canRead()) {
+                            findFiles(entry, minBytes);
+                        } else {
+                            this.outputter.outputError("Can't read directory " + entry);
+                        }
                     } else {
-                        this.outputter.outputError("Can't read directory " + entry);
+                        this.outputter.outputError("Skipping " + entry
+                                + " as it's not a file or dir");
                     }
                 } else {
-                    this.outputter.outputError("Skipping " + entry + " as it's not a file or dir");
+                    this.outputter.outputError("Skipping " + entry + " as it's a symlink");
                 }
-            } else {
-                this.outputter.outputError("Skipping " + entry + " as it's a symlink");
+            } catch (final NullPointerException e) {
+                // Some file operations can return null, so rather than test for them everywhere,
+                // catch here, and carry on.
+                this.outputter.outputError("Null pointer exception processing " + entry + " in "
+                        + dir + "\n" + exceptionToString(e));
             }
         }
+    }
+
+    /**
+     * Converts Exceptions to Strings. Taken from
+     * http://stackoverflow.com/questions/1149703/stacktrace-to-string-in-java
+     * 
+     * @param e the exception
+     * @return the stackstrace as a String
+     */
+    private String exceptionToString(final Exception e) {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
     }
 
     /**
