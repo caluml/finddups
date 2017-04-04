@@ -1,15 +1,15 @@
 This is a command line Java app to find duplicate files on your computer.
 
 You can either build the application from source, or download a pre-compiled version.
-To build from source, you need Git, a Java JDK, and Maven:
 
+To build from source, you need Git, a Java JDK, and Maven:
 git clone https://github.com/caluml/finddups
-mvn assembly:single install
-java -jar ~/.m2/repository/finddups/finddups/0.0.1-SNAPSHOT/finddups-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000 /home /tmp
+mvn assembly:single
+java -jar target/finddups-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000 /home /tmp
+
 
 To just run the supplied version (might be a little out of date):
-
-Download https://github.com/caluml/finddups/raw/master/finddups.jar
+Download https://github.com/caluml/finddups/releases/download/v0.0.1/finddups-0.0.1.jar
 java -jar finddups.jar 1000000 /home /tmp
 
 
@@ -23,5 +23,4 @@ The app outputs its errors to stderr, and its results to stdout as it goes.
 
 Any suggestions/comments to my github username at gmail.com
 
-TODO: Time generating two MD5s of two identical files and compare them, with comparing those two files byte by byte.
-CAVEAT: I have only tested this on Linux, with Java 6. 
+CAVEAT: I have only tested this on Linux, with Java 6, 7 and 8. 
