@@ -12,7 +12,8 @@ You can either build the application from source, or download a pre-compiled ver
 
 #### Build from source
 To build from source, you need Git, a Java JDK, and Maven:
-```git clone https://github.com/caluml/finddups
+```
+git clone https://github.com/caluml/finddups
 mvn assembly:single
 java -jar target/finddups-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000 /home /tmp
 ```
