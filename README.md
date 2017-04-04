@@ -18,14 +18,14 @@ java -jar target/finddups-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000 /home
 ```
 
 #### Precompiled
-To just run the supplied version (might be a little out of date):
-Download https://github.com/caluml/finddups/releases/download/v0.0.1/finddups-0.0.1.jar
+To just run the supplied version (might be a little out of date):<br>
+Download https://github.com/caluml/finddups/releases/download/v0.0.1/finddups-0.0.1.jar<br>
 `java -jar finddups-0.0.1.jar 1000000 /home /tmp`
 
 ### How does it work?
-First, it recurses the given directory/ies, building a list of files.
-Then, it looks for files which have identically sized files.
-It then reads those identically sized files, comparing them byte for byte until it finds a byte that doesn't match, or it reaches the end of the file.
+* First, it recurses the given directory/ies, building a list of files.
+* Then, it looks for files which have identically sized files.
+* It then reads those identically sized files, comparing them byte for byte until it finds a byte that doesn't match, or it reaches the end of the file.<br>
 The app outputs its errors to stderr, and its results to stdout as it goes.
 
 ### Why not use MD5 or SHA or $HASHING_ALGORITHM
