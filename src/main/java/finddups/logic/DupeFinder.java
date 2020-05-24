@@ -28,12 +28,15 @@ public class DupeFinder {
     for (final Map.Entry<Long, List<File>> entry : filesByLength.entrySet()) {
       final Long length = entry.getKey();
       final List<File> filesOfSameLength = entry.getValue();
+      outputter.output("  Checking files with size " + length + " : " + filesOfSameLength);
 
       final Map<String, Set<File>> identicalFilesMap = getIdenticalFiles(filesOfSameLength);
 
       for (final Map.Entry<String, Set<File>> identicalFilesEntry : identicalFilesMap.entrySet()) {
         final String checksum = identicalFilesEntry.getKey();
         final Set<File> identicalFiles = identicalFilesEntry.getValue();
+
+        outputter.output("    Found " + identicalFiles);
 
         result.add(new AbstractMap.SimpleEntry<>(checksum, identicalFiles));
 

@@ -49,10 +49,15 @@ public class FindDups {
     final Map<Long, List<File>> filesByLength = groupByLength(fileFindResult.getFoundFiles());
     final Map<Long, List<File>> duplicateFilesByLength = removeUniqueLengthFiles(filesByLength);
     final Map<Long, List<File>> duplicateFilesSortedByLength = sortByLength(duplicateFilesByLength);
-
+    int candidates = 0;
+    for (final List<File> fileList : duplicateFilesSortedByLength.values()) {
+      candidates = candidates + fileList.size();
+    }
+    outputter.output("  Filtered down to " + candidates + " candidates...");
 
     final DupeFinder dupeFinder = new DupeFinder(new Sha256Checksummer(), outputter);
-    outputter.output("Finding duplicates...");
+
+    outputter.output("Finding duplicates from " + candidates + " candidates...");
     final long startFindDups = System.currentTimeMillis();
     final List<Map.Entry<String, Set<File>>> duplicateMaps = dupeFinder.checkAllDupes(duplicateFilesSortedByLength);
     outputter.output("Found " + duplicateMaps.size() + " sets of duplicates in " + (System.currentTimeMillis() - startFindDups) + " ms");
