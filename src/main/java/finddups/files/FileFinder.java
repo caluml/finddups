@@ -15,9 +15,10 @@ public class FileFinder {
   }
 
   public FileFindResult findFiles(final FileFindRequest fileFindRequest) {
+    if (fileFindRequest.getPaths().length != 1) throw new RuntimeException("Multiple paths not supported yet");
     final long start = System.currentTimeMillis();
     final List<File> foundFiles = new ArrayList<>();
-    walk(new File(fileFindRequest.getPath()), foundFiles, fileFindRequest.getMinFileLength());
+    walk(new File(fileFindRequest.getPaths()[0]), foundFiles, fileFindRequest.getMinFileLength());
 
     return new FileFindResult(foundFiles, System.currentTimeMillis() - start);
   }

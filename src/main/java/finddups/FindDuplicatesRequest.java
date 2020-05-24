@@ -1,12 +1,12 @@
-package finddups.files;
+package finddups;
 
-public class FileFindRequest {
+public class FindDuplicatesRequest {
 
   private final long minFileLength;
   private final String[] paths;
 
-  public FileFindRequest(final long minFileLength,
-                         final String... paths) {
+  public FindDuplicatesRequest(final long minFileLength,
+                               final String... paths) {
     this.minFileLength = minFileLength;
     this.paths = paths;
   }
@@ -18,4 +18,5 @@ public class FileFindRequest {
   public String[] getPaths() {
     return paths;
   }
+
 }

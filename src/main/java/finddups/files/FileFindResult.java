@@ -5,7 +5,7 @@ import java.util.List;
 
 public class FileFindResult {
 
-  private final List<File> foundFiles;
+  private List<File> foundFiles;
   private final long mills;
 
   public FileFindResult(final List<File> foundFiles,

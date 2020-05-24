@@ -36,7 +36,7 @@ public class DeleteNewestDuplicateFileHandler implements DuplicateFileHandler {
       .sorted(Comparator.comparing(File::lastModified))
       .collect(Collectors.toList());
 
-    outputter.output("# Retaining oldest: " + oldestFirst.get(0));
+    outputter.output("#Retaining :" + oldestFirst.get(0));
     fileOutputter.output("echo Retaining oldest: " + oldestFirst.get(0));
     for (final File file : oldestFirst.subList(1, oldestFirst.size())) {
       outputter.output("${COMMAND} '" + file.getAbsolutePath() + "'");

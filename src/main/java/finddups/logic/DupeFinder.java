@@ -1,19 +1,18 @@
 package finddups.logic;
 
-import finddups.output.Outputter;
 import finddups.checksum.Checksummer;
-import finddups.io.IdenticalFileChecker;
+import finddups.output.LargeNumberFormatter;
+import finddups.output.Outputter;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DupeFinder {
 
-  private final IdenticalFileChecker identicalFileChecker = new IdenticalFileChecker();
+  private final Outputter outputter;
 
   private final Checksummer checksummer;
-
-  private final Outputter outputter;
 
   public DupeFinder(final Checksummer checksummer,
                     final Outputter outputter) {
@@ -28,45 +27,44 @@ public class DupeFinder {
     for (final Map.Entry<Long, List<File>> entry : filesByLength.entrySet()) {
       final Long length = entry.getKey();
       final List<File> filesOfSameLength = entry.getValue();
-      outputter.output("  Checking files with size " + length + " : " + filesOfSameLength);
+      outputter.output("  Checking files with size " + LargeNumberFormatter.format(length) + ":");
+      filesOfSameLength.forEach(f -> outputter.output("    " + f));
 
       final Map<String, Set<File>> identicalFilesMap = getIdenticalFiles(filesOfSameLength);
 
       for (final Map.Entry<String, Set<File>> identicalFilesEntry : identicalFilesMap.entrySet()) {
-        final String checksum = identicalFilesEntry.getKey();
-        final Set<File> identicalFiles = identicalFilesEntry.getValue();
+        outputter.output("Found duplicates of length " + LargeNumberFormatter.format(length) + " :");
+        identicalFilesEntry.getValue().forEach(f -> outputter.output(f.getAbsolutePath()));
+        result.add(identicalFilesEntry);
 
-        outputter.output("    Found " + identicalFiles);
-
-        result.add(new AbstractMap.SimpleEntry<>(checksum, identicalFiles));
-
-        bytesWasted = bytesWasted + (length * (identicalFiles.size() - 1));
+        bytesWasted = bytesWasted + ((identicalFilesEntry.getValue().size() - 1) * length);
       }
     }
 
-    outputter.output("Bytes wasted by duplication: " + bytesWasted);
+    outputter.output("Bytes wasted by duplication: " + LargeNumberFormatter.format(bytesWasted));
     return result;
   }
 
-  private Map<String, Set<File>> getIdenticalFiles(final List<File> files) {
-    files.sort(Comparator.comparing(File::getAbsolutePath));
-    final Map<String, Set<File>> identicalFilesMap = new HashMap<>();
+  private Map<String, Set<File>> getIdenticalFiles(final List<File> sameLengthFiles) {
+    assertAllSameLength(sameLengthFiles);
+    sameLengthFiles.sort(Comparator.comparing(File::getAbsolutePath));
 
-    for (int i = 0; i < files.size(); i++) {
-      for (int j = i + 1; j < files.size(); j++) {
-        final File file1 = files.get(i);
-        final File file2 = files.get(j);
-
-        if (identicalFileChecker.areFilesIdentical(file1, file2)) {
-          final String checksum = checksummer.getChecksum(file1);
-          final Set<File> identicalFileSet = identicalFilesMap.getOrDefault(checksum, new HashSet<>());
-          identicalFileSet.add(file1);
-          identicalFileSet.add(file2);
-          identicalFilesMap.put(checksum, identicalFileSet);
-        }
-      }
+    // We assume that most files of the same length will be identical, and therefore calculate the checksums first
+    final Map<String, Set<File>> fileChecksums = new HashMap<>();
+    for (final File file : sameLengthFiles) {
+      final String checksum = checksummer.getChecksum(file);
+      final Set<File> fileSet = fileChecksums.getOrDefault(checksum, new HashSet<>());
+      fileSet.add(file);
+      fileChecksums.put(checksum, fileSet);
     }
 
-    return identicalFilesMap;
+    return fileChecksums.entrySet().stream()
+      .filter(e -> e.getValue().size() > 1)
+      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  private void assertAllSameLength(final Collection<File> files) {
+    final Set<Long> sizes = files.stream().map(File::length).collect(Collectors.toSet());
+    if (sizes.size() != 1) throw new RuntimeException("Files should all be of the same length here");
   }
 }

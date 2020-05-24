@@ -5,6 +5,7 @@ package finddups.output;
  * 
  * @author calum
  */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class ConsoleOutputter implements Outputter {
 
     @Override
