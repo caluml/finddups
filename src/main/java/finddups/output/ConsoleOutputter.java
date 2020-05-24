@@ -1,11 +1,11 @@
-package finddups;
+package finddups.output;
 
 /**
  * Implementation of Outputter which outputs to System.out and System.err
  * 
  * @author calum
  */
-public class SysoutOutputter implements Outputter {
+public class ConsoleOutputter implements Outputter {
 
     @Override
     public void output(final String message) {

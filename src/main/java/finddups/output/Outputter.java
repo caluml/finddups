@@ -1,4 +1,4 @@
-package finddups;
+package finddups.output;
 
 /**
  * Interface for output.
