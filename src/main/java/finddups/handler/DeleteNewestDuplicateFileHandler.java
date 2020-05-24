@@ -14,31 +14,33 @@ public class DeleteNewestDuplicateFileHandler implements DuplicateFileHandler {
 
   private final Outputter outputter;
 
-  private final Outputter fileAppender;
+  private final Outputter fileOutputter;
 
   public DeleteNewestDuplicateFileHandler(final Outputter outputter,
                                           final String path) {
     this.outputter = outputter;
-    fileAppender = new FileOutputter(path, true);
+    fileOutputter = new FileOutputter(path, true);
     //noinspection HardcodedFileSeparator
-    fileAppender.output("#!/bin/bash");
-    fileAppender.output("");
+    fileOutputter.output("#!/bin/bash");
+    fileOutputter.output("");
+    outputter.output("COMMAND='rm -fv'");
+    fileOutputter.output("COMMAND='rm -fv'");
   }
 
   @Override
   public void handleDuplicates(final Map.Entry<String, Set<File>> duplicates) {
     outputter.output("# " + duplicates.getKey());
-    fileAppender.output("echo " + duplicates.getKey());
+    fileOutputter.output("echo " + duplicates.getKey());
 
     final List<File> oldestFirst = duplicates.getValue().stream()
       .sorted(Comparator.comparing(File::lastModified))
       .collect(Collectors.toList());
 
     outputter.output("# Retaining oldest: " + oldestFirst.get(0));
-    fileAppender.output("echo Retaining oldest: " + oldestFirst.get(0));
+    fileOutputter.output("echo Retaining oldest: " + oldestFirst.get(0));
     for (final File file : oldestFirst.subList(1, oldestFirst.size())) {
-      outputter.output("rm -fv " + file);
-      fileAppender.output("rm -fv " + file);
+      outputter.output("${COMMAND} '" + file.getAbsolutePath() + "'");
+      fileOutputter.output("${COMMAND} '" + file.getAbsolutePath() + "'");
     }
   }
 }

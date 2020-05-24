@@ -53,8 +53,9 @@ public class FindDups {
 
     final DupeFinder dupeFinder = new DupeFinder(new Sha256Checksummer(), outputter);
     outputter.output("Finding duplicates...");
+    final long startFindDups = System.currentTimeMillis();
     final List<Map.Entry<String, Set<File>>> duplicateMaps = dupeFinder.checkAllDupes(duplicateFilesSortedByLength);
-    outputter.output("Found " + duplicateMaps.size() + " sets of duplicates");
+    outputter.output("Found " + duplicateMaps.size() + " sets of duplicates in " + (System.currentTimeMillis() - startFindDups) + " ms");
 
 
     // Handle duplicates
